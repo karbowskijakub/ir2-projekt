@@ -1,14 +1,20 @@
-import React from 'react';
-import ChartPage from './pages/ChartPage';
-import Header from './components/Header';
+import React from "react";
+import ChartPage from "./pages/ChartPage";
+import MethodsPage from "./pages/MethodsPage";
+import InstructionPage from "./pages/InstructionPage";
+import Header from "./components/Header";
+import { Routes, Route } from "react-router-dom";
 
 function App() {
-  
   return (
-   <>
-   <Header/>
-   <ChartPage/>
-   </>
+    <>
+      <Header />
+      <Routes>
+        <Route path="/home" element={<ChartPage />} />
+        <Route path="/instruction" element={<InstructionPage />} />
+        <Route path="/methods" element={<MethodsPage />} />
+      </Routes>
+    </>
   );
 }
 

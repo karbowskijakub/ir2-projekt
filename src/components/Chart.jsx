@@ -154,7 +154,7 @@ const Chart = () => {
 
         {text !== null && average !== null && (
           <div className="my-10 font-bold text-lg">
-            {`Średnia z pliku: ${average.toFixed(2)}`} 
+            {`Średnia z pliku czas.txt: ${average.toFixed(2)}`} 
           </div>
         )}
       </div>
