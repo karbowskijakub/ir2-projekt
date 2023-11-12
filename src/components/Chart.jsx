@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Scatter } from "react-chartjs-2";
 import "chart.js/auto";
 import * as XLSX from "xlsx";
+import textfile from "../assets/czas.txt";
 
 const Chart = () => {
   const [data, setData] = useState([]);
   const [chartData, setChartData] = useState(null);
   const [uploadedData, setUploadedData] = useState([]);
+  const [text, setText] = useState();
+  const [average, setAverage] = useState(null);
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -36,16 +39,18 @@ const Chart = () => {
   };
 
   useEffect(() => {
-    if (data.length > 0) {
-      const maxAvgData = calculateMaxAvgData(data);
-
-      const chartData = {
-        labels: Array.from({ length: data.length }, (_, i) => i + 1),
+    if (data.length > 0 && average !== null) {
+      const multipliedData = data.map((value) => value * average);
+      const maxAvgData = calculateMaxAvgData(multipliedData);
+  
+      const maxYScale = Math.max(...multipliedData) + 0.001;
+  
+      const updatedChartData = {
+        labels: Array.from({ length: multipliedData.length }, (_, i) => i + 1),
         datasets: [
           {
             label: "Natężenie ruchu",
-            data: data.map((value, index) => ({ x: index, y: value })),
-
+            data: multipliedData.map((value, index) => ({ x: index, y: value })),
             backgroundColor: "rgba(75, 192, 192, 0.2)",
             showLine: false,
             pointRadius: 2,
@@ -59,26 +64,23 @@ const Chart = () => {
             pointRadius: 2,
           },
         ],
+        scales: {
+          x: {
+            type: "linear",
+            min: 0,
+            max: 1440,
+          },
+          y: {
+            type: "linear",
+            min: 0,
+            max: maxYScale,
+          },
+        },
       };
-
-      setChartData(chartData);
+  
+      setChartData(updatedChartData);
     }
-  }, [data]);
-
-  const chartOptions = {
-    scales: {
-      x: {
-        type: "linear",
-        min: 0,
-        max: 1440,
-      },
-      y: {
-        type: "linear",
-        min: 0,
-        max: 0.005,
-      },
-    },
-  };
+  }, [data, average]);
 
   const calculateMaxAvgData = (data) => {
     let maxAvg = -1;
@@ -87,9 +89,7 @@ const Chart = () => {
     for (let i = 0; i < 24; i++) {
       const startIndexGroup = i * 60;
       const avgGroup =
-        data
-          .slice(startIndexGroup, startIndexGroup + 60)
-          .reduce((acc, val) => acc + val, 0) / 60;
+        data.slice(startIndexGroup, startIndexGroup + 60).reduce((acc, val) => acc + val, 0) / 60;
       if (avgGroup > maxAvg) {
         maxAvg = avgGroup;
         startIndex = startIndexGroup;
@@ -109,18 +109,40 @@ const Chart = () => {
     }
   };
 
+  useEffect(() => {
+    fetch(textfile)
+      .then((response) => response.text())
+      .then((textContent) => {
+        setText(textContent);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (text !== undefined) {
+      const numbers = text
+        .trim()
+        .split(/\s+/)
+        .map(Number)
+        .filter((num) => !isNaN(num));
+
+      if (numbers.length > 0) {
+        const sum = numbers.reduce((acc, num) => acc + num, 0);
+        const avg = sum / numbers.length;
+        setAverage(avg);
+      }
+    }
+  }, [text]);
+
   return (
     <div>
       <div className="mb-10 font-bold text-lg">
-        <p>Natężenie ruchu w skali od 0 do 0.005 w ciągu doby w minutach:</p>
+        <p>Natężenie ruchu w skali od 0 do 0.45 ciągu doby w minutach:</p>
       </div>
       {chartData && (
         <div style={{ minWidth: "800px", margin: "0 auto" }}>
-          <Scatter data={chartData} options={chartOptions} />
+          <Scatter data={chartData}  />
           <div className="my-10 font-bold text-lg">
-            {`${chartData.datasets[1].label}: ${
-              chartData.datasets[1].data[0].x + 1
-            } - ${chartData.datasets[1].data[59].x + 1}`}
+            {`${chartData.datasets[1].label}: ${chartData.datasets[1].data[0].x + 1} - ${chartData.datasets[1].data[59].x + 1}`}
           </div>
         </div>
       )}
@@ -129,8 +151,12 @@ const Chart = () => {
         <button onClick={updateChartWithUploadedData} className="btn-primary">
           Dodaj dane do wykresu
         </button>
-        {/* <h2>Pobrane dane:</h2>
-        <pre>{JSON.stringify(uploadedData, null, 2)}</pre> */}
+
+        {text !== null && average !== null && (
+          <div className="my-10 font-bold text-lg">
+            {`Średnia z pliku: ${average.toFixed(2)}`} 
+          </div>
+        )}
       </div>
     </div>
   );
