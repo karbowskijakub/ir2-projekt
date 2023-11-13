@@ -10,7 +10,7 @@ const Header = () => {
       <div className="mr-10">
         <ul className="flex justify-center flex-row">
         <li className="cursor-pointer p-4 ">
-            <NavLink to="/home">Wykres GNR</NavLink>
+            <NavLink to="/">Wykres GNR</NavLink>
           </li>
           <li className="cursor-pointer  p-4">
             <NavLink to="/methods">Metody GNR</NavLink>

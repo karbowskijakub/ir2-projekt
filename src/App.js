@@ -10,7 +10,7 @@ function App() {
     <>
       <Header />
       <Routes>
-        <Route path="/home" element={<ChartPage />} />
+        <Route path="/" element={<ChartPage />} />
         <Route path="/instruction" element={<InstructionPage />} />
         <Route path="/methods" element={<MethodsPage />} />
       </Routes>
