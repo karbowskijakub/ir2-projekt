@@ -42,15 +42,18 @@ const Chart = () => {
     if (data.length > 0 && average !== null) {
       const multipliedData = data.map((value) => value * average);
       const maxAvgData = calculateMaxAvgData(multipliedData);
-  
+
       const maxYScale = Math.max(...multipliedData) + 0.001;
-  
+
       const updatedChartData = {
         labels: Array.from({ length: multipliedData.length }, (_, i) => i + 1),
         datasets: [
           {
             label: "Natężenie ruchu",
-            data: multipliedData.map((value, index) => ({ x: index, y: value })),
+            data: multipliedData.map((value, index) => ({
+              x: index,
+              y: value,
+            })),
             backgroundColor: "rgba(75, 192, 192, 0.2)",
             showLine: false,
             pointRadius: 2,
@@ -77,7 +80,7 @@ const Chart = () => {
           },
         },
       };
-  
+
       setChartData(updatedChartData);
     }
   }, [data, average]);
@@ -89,7 +92,9 @@ const Chart = () => {
     for (let i = 0; i < 24; i++) {
       const startIndexGroup = i * 60;
       const avgGroup =
-        data.slice(startIndexGroup, startIndexGroup + 60).reduce((acc, val) => acc + val, 0) / 60;
+        data
+          .slice(startIndexGroup, startIndexGroup + 60)
+          .reduce((acc, val) => acc + val, 0) / 60;
       if (avgGroup > maxAvg) {
         maxAvg = avgGroup;
         startIndex = startIndexGroup;
@@ -134,15 +139,18 @@ const Chart = () => {
   }, [text]);
 
   return (
-    <div>
-      <div className="mb-10 font-bold text-lg">
+    <div className="p-10 mt-28 flex justify-center items-center flex-col">
+      <div className="mb-10 font-bold text-lg ">
+        <h1 className="text-4xl">Obliczanie godziny największego ruchu w ciągu doby metodą TCBH</h1>
         <p>Natężenie ruchu w skali od 0 do 0.45 ciągu doby w minutach:</p>
       </div>
       {chartData && (
         <div style={{ minWidth: "800px", margin: "0 auto" }}>
-          <Scatter data={chartData}  />
+          <Scatter data={chartData} />
           <div className="my-10 font-bold text-lg">
-            {`${chartData.datasets[1].label}: ${chartData.datasets[1].data[0].x + 1} - ${chartData.datasets[1].data[59].x + 1}`}
+            {`${chartData.datasets[1].label}: ${
+              chartData.datasets[1].data[0].x + 1
+            } - ${chartData.datasets[1].data[59].x + 1}`}
           </div>
         </div>
       )}
@@ -154,7 +162,7 @@ const Chart = () => {
 
         {text !== null && average !== null && (
           <div className="my-10 font-bold text-lg">
-            {`Średnia z pliku czas.txt: ${average.toFixed(2)}`} 
+            {`Średnia z pliku czas.txt: ${average.toFixed(2)}`}
           </div>
         )}
       </div>
