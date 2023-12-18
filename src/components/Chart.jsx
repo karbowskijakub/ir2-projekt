@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Scatter } from "react-chartjs-2";
 import "chart.js/auto";
 import * as XLSX from "xlsx";
-import textfile from "../assets/czas.txt";
+import textfile from "../assets/data/czas.txt";
+import SecondMethod from "./SecondMethod";
 
 const Chart = () => {
   const [data, setData] = useState([]);
@@ -141,31 +142,35 @@ const Chart = () => {
   return (
     <div className="p-10 mt-28 flex justify-center items-center flex-col">
       <div className="mb-10 font-bold text-lg ">
-        <h1 className="text-4xl">Obliczanie godziny największego ruchu w ciągu doby metodą TCBH</h1>
+        <h1 className="text-4xl">
+          Obliczanie godziny największego ruchu w ciągu doby metodą TCBH
+        </h1>
         <p>Natężenie ruchu w skali od 0 do 0.45 ciągu doby w minutach:</p>
       </div>
       {chartData && (
         <div style={{ minWidth: "800px", margin: "0 auto" }}>
           <Scatter data={chartData} />
-          <div className="my-10 font-bold text-lg">
+          <div className="bg-tetnary rounded p-1 text-white">
+          <div className="p-3 font-bold text-lg">
             {`${chartData.datasets[1].label}: ${
               chartData.datasets[1].data[0].x + 1
             } - ${chartData.datasets[1].data[59].x + 1}`}
           </div>
+          {text !== null && average !== null && (
+            <div className="font-bold text-lg p-3">
+              {`Średnia z pliku czas.txt: ${average.toFixed(2)}`}
+            </div>
+          )}
+          </div>
         </div>
       )}
-      <div>
+      <div className="mt-5">
         <input type="file" accept=".xlsx" onChange={handleFileUpload} />
         <button onClick={updateChartWithUploadedData} className="btn-primary">
           Dodaj dane do wykresu
         </button>
-
-        {text !== null && average !== null && (
-          <div className="my-10 font-bold text-lg">
-            {`Średnia z pliku czas.txt: ${average.toFixed(2)}`}
-          </div>
-        )}
       </div>
+      <SecondMethod />
     </div>
   );
 };
