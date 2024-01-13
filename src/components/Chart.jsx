@@ -5,13 +5,20 @@ import * as XLSX from "xlsx";
 import textfile from "../assets/data/czas.txt";
 import SecondMethod from "./SecondMethod";
 
+// Komponent Chart
 const Chart = () => {
+  // Stan przechowujący dane do wykresu
   const [data, setData] = useState([]);
+  // Stan przechowujący dane do przekazania do komponentu Scatter Chart
   const [chartData, setChartData] = useState(null);
+  // Stan przechowujący dane wczytane z pliku
   const [uploadedData, setUploadedData] = useState([]);
+  // Stan przechowujący tekst z pliku czas.txt
   const [text, setText] = useState();
+  // Stan przechowujący średnią wartość z pliku czas.txt
   const [average, setAverage] = useState(null);
 
+  // Obsługa wczytywania pliku
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -39,13 +46,18 @@ const Chart = () => {
     }
   };
 
+  // Efekt uruchamiany po wczytaniu danych z pliku
   useEffect(() => {
     if (data.length > 0 && average !== null) {
+      // Mnożenie danych przez średnią wartość
       const multipliedData = data.map((value) => value * average);
+      // Obliczanie danych dla linii reprezentującej najwyższą średnią ruchu
       const maxAvgData = calculateMaxAvgData(multipliedData);
 
+      // Ustalanie maksymalnej wartości na osi Y dla wykresu
       const maxYScale = Math.max(...multipliedData) + 0.001;
 
+      // Aktualizacja danych do wykresu
       const updatedChartData = {
         labels: Array.from({ length: multipliedData.length }, (_, i) => i + 1),
         datasets: [
@@ -86,6 +98,7 @@ const Chart = () => {
     }
   }, [data, average]);
 
+  // Funkcja obliczająca dane dla najwyższej średniej ruchu
   const calculateMaxAvgData = (data) => {
     let maxAvg = -1;
     let startIndex = 0;
@@ -108,6 +121,7 @@ const Chart = () => {
     }));
   };
 
+  // Aktualizacja danych do wykresu po wczytaniu pliku
   const updateChartWithUploadedData = () => {
     if (uploadedData.length > 0) {
       const updatedData = [...data, ...uploadedData];
@@ -115,6 +129,7 @@ const Chart = () => {
     }
   };
 
+  // Efekt wczytujący tekst z pliku czas.txt
   useEffect(() => {
     fetch(textfile)
       .then((response) => response.text())
@@ -123,6 +138,7 @@ const Chart = () => {
       });
   }, []);
 
+  // Efekt obliczający średnią z tekstu wczytanego z pliku czas.txt
   useEffect(() => {
     if (text !== undefined) {
       const numbers = text
@@ -139,6 +155,7 @@ const Chart = () => {
     }
   }, [text]);
 
+  // Renderowanie komponentu Chart
   return (
     <div className="p-10 mt-28 flex justify-center items-center flex-col">
       <div className="mb-10 font-bold text-lg ">
@@ -151,16 +168,16 @@ const Chart = () => {
         <div style={{ minWidth: "800px", margin: "0 auto" }}>
           <Scatter data={chartData} />
           <div className="bg-tetnary rounded p-1 text-white">
-          <div className="p-3 font-bold text-lg">
-            {`${chartData.datasets[1].label}: ${
-              chartData.datasets[1].data[0].x + 1
-            } - ${chartData.datasets[1].data[59].x + 1}`}
-          </div>
-          {text !== null && average !== null && (
-            <div className="font-bold text-lg p-3">
-              {`Średnia z pliku czas.txt: ${average.toFixed(2)}`}
+            <div className="p-3 font-bold text-lg">
+              {`${chartData.datasets[1].label}: ${
+                chartData.datasets[1].data[0].x + 1
+              } - ${chartData.datasets[1].data[59].x + 1}`}
             </div>
-          )}
+            {text !== null && average !== null && (
+              <div className="font-bold text-lg p-3">
+                {`Średnia z pliku czas.txt: ${average.toFixed(2)}`}
+              </div>
+            )}
           </div>
         </div>
       )}
