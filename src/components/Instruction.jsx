@@ -2,7 +2,7 @@ import React from "react";
 
 const Instruction = () => {
   return (
-    <div className="w-full h-screen mt-10 flex justify-center">
+    <div className="w-full h-full mt-10 flex justify-center">
       <div className=" bg-tetnary w-1/2 h-full  rounded  flex justify-start flex-col p-10">
         <div className="my-10">
           <h1 className="text-white uppercase text-center text-5xl ">
